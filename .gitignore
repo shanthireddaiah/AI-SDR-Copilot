@@ -1,0 +1,27 @@
+# Python / Virtual Environment
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+env/
+ENV/
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media/pdf_documents/
+
+# Environment Variables
+.env
+
+# Vector Database Store
+chromadb_store/
+
+# IDE / System
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

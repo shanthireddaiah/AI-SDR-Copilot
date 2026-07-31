@@ -1,0 +1,184 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - AI SDR Copilot{% endblock %}
+{% block page_heading %}Dashboard{% endblock %}
+
+{% block content %}
+<!-- Dashboard Header -->
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 pb-2 border-bottom">
+  <div>
+    <h1 class="page-title mb-1">Welcome back, {{ user.username }}!</h1>
+    <p class="text-muted small mb-0">Here is your sales research overview and AI copilot activity today.</p>
+  </div>
+  <div class="mt-3 mt-md-0 d-flex gap-2">
+    <a href="{% url 'research:index' %}" class="btn btn-saas-primary">
+      <i class="bi bi-plus-lg me-1"></i> Research Company
+    </a>
+  </div>
+</div>
+
+<!-- 4 Metric Cards -->
+<div class="row g-4 mb-4">
+  
+  <!-- Metric 1: Companies Researched -->
+  <div class="col-sm-6 col-xl-3">
+    <div class="card-saas-light card-saas-interactive p-4 h-100">
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <span class="text-muted small font-mono fw-semibold text-uppercase">Companies Researched</span>
+        <div class="metric-icon-circle metric-blue">
+          <i class="bi bi-building"></i>
+        </div>
+      </div>
+      <h2 class="fw-bold text-dark mb-1" style="font-size: 30px;">{{ total_companies }}</h2>
+      <p class="text-muted extra-small mb-0">Target accounts analyzed by AI</p>
+    </div>
+  </div>
+
+  <!-- Metric 2: AI Generated Emails -->
+  <div class="col-sm-6 col-xl-3">
+    <div class="card-saas-light card-saas-interactive p-4 h-100">
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <span class="text-muted small font-mono fw-semibold text-uppercase">AI Outreach Built</span>
+        <div class="metric-icon-circle metric-emerald">
+          <i class="bi bi-send-check"></i>
+        </div>
+      </div>
+      <h2 class="fw-bold text-dark mb-1" style="font-size: 30px;">{{ total_companies }}</h2>
+      <p class="text-muted extra-small mb-0">Personalized emails & LinkedIn messages</p>
+    </div>
+  </div>
+
+  <!-- Metric 3: Knowledge Base Documents -->
+  <div class="col-sm-6 col-xl-3">
+    <div class="card-saas-light card-saas-interactive p-4 h-100">
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <span class="text-muted small font-mono fw-semibold text-uppercase">Knowledge Base Docs</span>
+        <div class="metric-icon-circle metric-purple">
+          <i class="bi bi-file-earmark-pdf"></i>
+        </div>
+      </div>
+      <h2 class="fw-bold text-dark mb-1" style="font-size: 30px;">{{ uploaded_docs }}</h2>
+      <p class="text-muted extra-small mb-0">PDFs indexed in ChromaDB vector store</p>
+    </div>
+  </div>
+
+  <!-- Metric 4: AI Copilot Sessions -->
+  <div class="col-sm-6 col-xl-3">
+    <div class="card-saas-light card-saas-interactive p-4 h-100">
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <span class="text-muted small font-mono fw-semibold text-uppercase">Copilot Sessions</span>
+        <div class="metric-icon-circle metric-amber">
+          <i class="bi bi-chat-left-quote"></i>
+        </div>
+      </div>
+      <h2 class="fw-bold text-dark mb-1" style="font-size: 30px;">{{ total_chats }}</h2>
+      <p class="text-muted extra-small mb-0">Sales recommendations generated</p>
+    </div>
+  </div>
+
+</div>
+
+<!-- Quick Actions Banner -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="card-saas-light p-4" style="background-color: var(--primary-subtle); border-color: #DBEAFE;">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
+        <div>
+          <h5 class="fw-bold text-dark mb-1"><i class="bi bi-lightning-charge-fill text-primary me-2"></i>Quick SDR Actions</h5>
+          <p class="text-secondary small mb-0">Select a workflow to accelerate your prospect research</p>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+          <a href="{% url 'research:index' %}" class="btn btn-saas-primary">
+            <i class="bi bi-plus-lg me-1"></i> Research Company
+          </a>
+          <a href="{% url 'rag:index' %}" class="btn btn-saas-secondary">
+            <i class="bi bi-upload me-1"></i> Upload PDF Collateral
+          </a>
+          <a href="{% url 'chat:index' %}" class="btn btn-saas-secondary">
+            <i class="bi bi-robot me-1"></i> Launch AI Copilot
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bottom Section: Recent Research & AI Activity -->
+<div class="row g-4">
+  
+  <!-- Left Column: Recent Accounts Researched -->
+  <div class="col-lg-6">
+    <div class="card-saas-light h-100">
+      <div class="card-header-light d-flex justify-content-between align-items-center">
+        <div class="card-title-saas mb-0"><i class="bi bi-clock-history text-primary me-2"></i>Recent Research</div>
+        <a href="{% url 'research:index' %}" class="saas-link small">View All</a>
+      </div>
+      <div class="card-body p-0">
+        {% if recent_companies %}
+          <div class="list-group list-group-flush">
+            {% for company in recent_companies %}
+              <a href="{% url 'research:detail' company.id %}" class="list-group-item list-group-item-action border-bottom p-3 d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 class="mb-0 fw-semibold text-dark">{{ company.name }}</h6>
+                  <span class="text-muted small"><i class="bi bi-tag me-1"></i>{{ company.industry|default:"General Industry" }}</span>
+                </div>
+                <span class="badge bg-light text-secondary border px-3 py-1 rounded-pill small">{{ company.created_at|date:"M d, Y" }}</span>
+              </a>
+            {% endfor %}
+          </div>
+        {% else %}
+          <!-- Empty State -->
+          <div class="empty-state-box">
+            <div class="empty-state-icon">
+              <i class="bi bi-building"></i>
+            </div>
+            <h6 class="fw-bold text-dark mb-1">No Researched Accounts</h6>
+            <p class="small text-muted mb-3">You haven't added any target prospect companies yet.</p>
+            <a href="{% url 'research:index' %}" class="btn btn-saas-primary btn-sm">
+              <i class="bi bi-plus-lg me-1"></i> Add Target Company
+            </a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Column: Recent Copilot Activity -->
+  <div class="col-lg-6">
+    <div class="card-saas-light h-100">
+      <div class="card-header-light d-flex justify-content-between align-items-center">
+        <div class="card-title-saas mb-0"><i class="bi bi-chat-dots text-primary me-2"></i>AI Copilot Activity</div>
+        <a href="{% url 'chat:index' %}" class="saas-link small">Open Copilot</a>
+      </div>
+      <div class="card-body p-0">
+        {% if recent_chats %}
+          <div class="list-group list-group-flush">
+            {% for chat in recent_chats %}
+              <div class="list-group-item border-bottom p-3">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                  <span class="fw-semibold text-primary small">Q: {{ chat.question|truncatechars:45 }}</span>
+                  <span class="text-muted extra-small">{{ chat.timestamp|date:"H:i, M d" }}</span>
+                </div>
+                <p class="text-muted small mb-0">{{ chat.answer|truncatechars:85 }}</p>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <!-- Empty State -->
+          <div class="empty-state-box">
+            <div class="empty-state-icon">
+              <i class="bi bi-chat-left-dots"></i>
+            </div>
+            <h6 class="fw-bold text-dark mb-1">No AI Copilot History</h6>
+            <p class="small text-muted mb-3">Ask questions about target accounts or sales collateral.</p>
+            <a href="{% url 'chat:index' %}" class="btn btn-saas-primary btn-sm">
+              <i class="bi bi-robot me-1"></i> Start AI Session
+            </a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

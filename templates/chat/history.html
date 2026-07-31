@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}AI Chat History | AI SDR Copilot{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="page-title mb-1">AI Sales Copilot Chat History</h1>
+        <p class="text-secondary small mb-0">Review past Q&A advice, prompt sessions, and sales strategy recommendations.</p>
+    </div>
+    <div>
+        <a href="{% url 'chat:index' %}" class="btn btn-saas-primary">
+            <i class="bi bi-chat-dots me-1"></i> Launch AI Copilot Chat
+        </a>
+    </div>
+</div>
+
+<!-- Search Bar -->
+<div class="card card-saas-light p-3 mb-4">
+    <form method="GET" class="row g-2">
+        <div class="col-md-10">
+            <input type="text" name="q" value="{{ query }}" class="form-control form-control-saas" placeholder="Search by question or AI answer keyword...">
+        </div>
+        <div class="col-md-2 d-grid">
+            <button type="submit" class="btn btn-saas-secondary"><i class="bi bi-search me-1"></i> Search</button>
+        </div>
+    </form>
+</div>
+
+{% if page_obj %}
+<div class="row g-4 mb-4">
+    {% for chat in page_obj %}
+    <div class="col-12">
+        <div class="card card-saas-light p-4">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+                <div>
+                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle me-2">
+                        {% if chat.company %}<i class="bi bi-building me-1"></i>{{ chat.company.name }}{% else %}General Sales Query{% endif %}
+                    </span>
+                    <span class="text-muted small">{{ chat.timestamp|date:"M d, Y H:i" }}</span>
+                </div>
+                <div class="d-flex gap-2">
+                    <a href="{% url 'chat:export_pdf' chat.pk %}" class="btn btn-sm btn-saas-secondary"><i class="bi bi-file-pdf text-danger me-1"></i> PDF</a>
+                    <a href="{% url 'chat:export_txt' chat.pk %}" class="btn btn-sm btn-saas-secondary"><i class="bi bi-file-text text-secondary me-1"></i> TXT</a>
+                    <button class="btn btn-sm btn-saas-secondary" onclick="copyToClipboard('chat-answer-{{ chat.id }}', this)"><i class="bi bi-clipboard"></i> Copy</button>
+                </div>
+            </div>
+
+            <div class="fw-semibold text-dark fs-6 mb-2">
+                <i class="bi bi-question-circle text-primary me-2"></i>{{ chat.question }}
+            </div>
+
+            <div class="bg-light p-3 border rounded text-secondary small" id="chat-answer-{{ chat.id }}" style="white-space: pre-wrap; line-height: 1.6;">{{ chat.answer }}</div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Pagination Controls -->
+{% if page_obj.has_other_pages %}
+<nav aria-label="Chat history pagination">
+    <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}&q={{ query }}">Previous</a></li>
+        {% endif %}
+        
+        {% for num in page_obj.paginator.page_range %}
+            <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                <a class="page-link" href="?page={{ num }}&q={{ query }}">{{ num }}</a>
+            </li>
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}&q={{ query }}">Next</a></li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+
+{% else %}
+<div class="card card-saas-light p-5 text-center">
+    <div class="empty-state-icon"><i class="bi bi-chat-square-x"></i></div>
+    <h5 class="fw-bold text-dark mb-2">No Chat History Found</h5>
+    <p class="text-secondary small mb-3">Ask questions to your AI Sales Copilot to generate strategy recommendations.</p>
+    <div>
+        <a href="{% url 'chat:index' %}" class="btn btn-saas-primary"><i class="bi bi-chat-dots me-1"></i> Start Chat Session</a>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,190 @@
+{% extends 'base.html' %}
+
+{% block title %}RAG Knowledge Base - AI SDR Copilot{% endblock %}
+{% block page_heading %}Knowledge Base (RAG){% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+  <div>
+    <h1 class="page-title mb-1">Sales Document Knowledge Base</h1>
+    <p class="text-muted small mb-0">Upload PDF sales collateral to extract text chunks and store vector embeddings in ChromaDB.</p>
+  </div>
+</div>
+
+<div class="row g-4">
+  
+  <!-- Left Column: PDF Drag & Drop Upload Form -->
+  <div class="col-lg-5">
+    <div class="card-saas-light p-4 shadow-sm">
+      <div class="d-flex align-items-center gap-3 mb-3">
+        <div class="metric-icon-circle metric-purple">
+          <i class="bi bi-file-earmark-pdf"></i>
+        </div>
+        <div>
+          <h5 class="fw-bold text-dark mb-0">Upload Sales PDF Document</h5>
+          <span class="text-muted extra-small">ChromaDB Vector Store Ingestion</span>
+        </div>
+      </div>
+
+      <form method="POST" action="{% url 'rag:index' %}" enctype="multipart/form-data" id="pdf-upload-form">
+        {% csrf_token %}
+        
+        <div class="mb-3">
+          <label for="title" class="form-label-saas">Document Title <span class="text-danger">*</span></label>
+          <input type="text" name="title" id="title" class="form-control form-control-saas" placeholder="e.g. Q3 Product Catalog & Pricing Guide" required>
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label-saas">PDF Document File <span class="text-danger">*</span></label>
+          <div class="dropzone-light" id="dropzone">
+            <i class="bi bi-cloud-arrow-up display-5 text-primary mb-2"></i>
+            <h6 class="fw-bold text-dark mb-1">Drag & Drop PDF File Here</h6>
+            <p class="text-muted small mb-3">or click to browse from computer</p>
+            <input type="file" name="pdf_file" id="pdf_file" accept=".pdf" class="d-none" required>
+            <span class="badge bg-light text-primary border px-3 py-1.5 rounded-pill small" id="file-name-display">No file selected</span>
+          </div>
+        </div>
+
+        <!-- Progress Indicator Bar -->
+        <div class="mb-4 d-none" id="upload-progress-container">
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <span class="text-muted small">Extracting PDF text & embedding into ChromaDB...</span>
+            <span class="text-primary fw-bold small">Processing...</span>
+          </div>
+          <div class="progress bg-light border" style="height: 8px;">
+            <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" role="progressbar" style="width: 100%;"></div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-saas-primary w-100 py-2.5" id="btn-submit-pdf">
+          <i class="bi bi-cpu me-1"></i> Extract & Store Vectors
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Right Column: Document Library Table -->
+  <div class="col-lg-7">
+    <div class="card-saas-light h-100">
+      <div class="card-header-light d-flex justify-content-between align-items-center">
+        <div class="card-title-saas mb-0"><i class="bi bi-folder2-open text-primary me-2"></i>Indexed Documents</div>
+        <span class="badge bg-light text-primary border px-3 py-1.5 rounded-pill small">{{ documents|length }} Files</span>
+      </div>
+      <div class="card-body p-0">
+        {% if documents %}
+          <div class="table-responsive">
+            <table class="table table-saas table-hover mb-0 align-middle">
+              <thead>
+                <tr>
+                  <th class="ps-4">Title & File</th>
+                  <th>Vector Chunks</th>
+                  <th>Uploaded</th>
+                  <th class="text-end pe-4">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for doc in documents %}
+                  <tr>
+                    <td class="ps-4">
+                      <div class="fw-semibold text-dark">{{ doc.title }}</div>
+                      <span class="text-muted extra-small"><i class="bi bi-file-pdf text-danger me-1"></i>{{ doc.file_name }}</span>
+                    </td>
+                    <td>
+                      <span class="badge bg-light text-primary border px-3 py-1 rounded-pill small">{{ doc.chunk_count }} Chunks</span>
+                    </td>
+                    <td class="text-muted extra-small">{{ doc.uploaded_at|date:"M d, Y" }}</td>
+                    <td class="text-end pe-4">
+                      <button type="button" class="btn btn-sm btn-saas-secondary border-0 text-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ doc.id }}">
+                        <i class="bi bi-trash fs-6"></i>
+                      </button>
+
+                      <!-- Delete Confirmation Modal -->
+                      <div class="modal fade" id="deleteModal{{ doc.id }}" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                          <div class="modal-content text-start card-saas-light">
+                            <div class="modal-header border-bottom">
+                              <h5 class="modal-title text-dark fw-bold"><i class="bi bi-exclamation-triangle-fill text-danger me-2"></i>Delete Document</h5>
+                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body text-secondary">
+                              Are you sure you want to delete <strong>"{{ doc.title }}"</strong>?<br><br>
+                              <span class="text-danger small"><i class="bi bi-info-circle me-1"></i>This will permanently remove the PDF file and purge all associated vector embeddings from ChromaDB.</span>
+                            </div>
+                            <div class="modal-footer border-top">
+                              <button type="button" class="btn btn-saas-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                              <form method="POST" action="{% url 'rag:index' %}" class="d-inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="delete">
+                                <input type="hidden" name="doc_id" value="{{ doc.id }}">
+                                <button type="submit" class="btn btn-danger btn-sm">Delete & Purge Vectors</button>
+                              </form>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <!-- Empty State -->
+          <div class="empty-state-box">
+            <div class="empty-state-icon">
+              <i class="bi bi-file-earmark-pdf"></i>
+            </div>
+            <h6 class="fw-bold text-dark mb-1">No Indexed Documents</h6>
+            <p class="small text-muted mb-0">Upload a PDF sales brochure or pricing document on the left.</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const dropzone = document.getElementById('dropzone');
+const fileInput = document.getElementById('pdf_file');
+const fileNameDisplay = document.getElementById('file-name-display');
+const uploadForm = document.getElementById('pdf-upload-form');
+const progressContainer = document.getElementById('upload-progress-container');
+
+if (dropzone && fileInput) {
+  dropzone.addEventListener('click', () => fileInput.click());
+
+  dropzone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropzone.classList.add('dragover');
+  });
+
+  dropzone.addEventListener('dragleave', () => {
+    dropzone.classList.remove('dragover');
+  });
+
+  dropzone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropzone.classList.remove('dragover');
+    if (e.dataTransfer.files.length > 0) {
+      fileInput.files = e.dataTransfer.files;
+      if (fileNameDisplay) fileNameDisplay.innerText = e.dataTransfer.files[0].name;
+    }
+  });
+
+  fileInput.addEventListener('change', () => {
+    if (fileInput.files.length > 0 && fileNameDisplay) {
+      fileNameDisplay.innerText = fileInput.files[0].name;
+    }
+  });
+}
+
+if (uploadForm && progressContainer) {
+  uploadForm.addEventListener('submit', () => {
+    progressContainer.classList.remove('d-none');
+  });
+}
+</script>
+{% endblock %}

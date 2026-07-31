@@ -1,0 +1,23 @@
+=== AI SDR COPILOT - COMPLETE SYSTEM & TECHNICAL OVERVIEW ===
+
+AI SDR COPILOT SYSTEM SUMMARY
+
+1. OVERVIEW:
+AI SDR Copilot is an enterprise-grade AI Sales Development Representative Assistant built with Python, Django 5, MySQL, OpenAI API, LangGraph, ChromaDB, PyPDF2, and Bootstrap 5.
+
+2. PDF FEATURES IN THIS PROJECT:
+- Ingestion & Extraction: Upload PDF sales collateral in the RAG Knowledge Base. Extracted using PyPDF2 and indexed into ChromaDB vector store.
+- PDF Report Export: 1-Click export of Company Research Briefs, Sales Outreach Pitches, and AI Sales Copilot Chat Sessions as ReportLab PDF downloads.
+
+3. PDF ENDPOINTS:
+- GET /research/<id>/pdf/ - Download Research Brief PDF
+- GET /outreach/<id>/pdf/ - Download Outreach Pitch PDF
+- GET /chat/<id>/pdf/ - Download Chat Session PDF
+- POST /rag/ - Upload & Index Sales PDF Collateral
+
+4. TECH STACK:
+- Framework: Django 5.0+
+- Database: MySQL 8.0+ & ChromaDB Vector Store
+- PDF Engine: ReportLab & PyPDF2
+- AI Engine: OpenAI GPT-4o-mini & LangGraph StateGraph
+

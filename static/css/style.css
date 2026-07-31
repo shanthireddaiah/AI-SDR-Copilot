@@ -1,0 +1,509 @@
+/* ==========================================================================
+   AI SDR Research Copilot - Light Corporate SaaS Design System
+   Inspired by Google, Microsoft, OpenAI, Notion, Stripe, Linear & Vercel
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+  /* Clean Light SaaS Color Palette */
+  --bg-main: #F8FAFC;        /* Slate 50 */
+  --bg-card: #FFFFFF;        /* Pure White */
+  --bg-sidebar: #FFFFFF;     /* Pure White Sidebar */
+  --bg-topbar: #FFFFFF;      /* Pure White Topbar */
+  --bg-input: #FFFFFF;       /* Input Background */
+  --bg-input-hover: #F1F5F9;
+  
+  --border-color: #E5E7EB;   /* Gray 200 */
+  --border-subtle: #F3F4F6;  /* Gray 100 */
+  
+  --text-primary: #111827;   /* Gray 900 */
+  --text-secondary: #6B7280; /* Gray 500 */
+  --text-muted: #9CA3AF;     /* Gray 400 */
+  
+  --primary-blue: #2563EB;   /* Blue 600 */
+  --primary-hover: #1D4ED8;  /* Blue 700 */
+  --primary-subtle: #EFF6FF; /* Blue 50 */
+  
+  --success: #22C55E;        /* Emerald 500 */
+  --success-subtle: #F0FDF4;
+  --warning: #F59E0B;        /* Amber 500 */
+  --warning-subtle: #FFFBEB;
+  --danger: #EF4444;         /* Red 500 */
+  --danger-subtle: #FEF2F2;
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.03);
+  --shadow-hover: 0 12px 20px -5px rgba(37, 99, 235, 0.12), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+}
+
+/* Base Body & Inter Typography Reset */
+body {
+  background-color: var(--bg-main);
+  color: var(--text-primary);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--text-primary);
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.page-title {
+  font-size: 26px !important;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.section-title {
+  font-size: 20px !important;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.card-title-saas {
+  font-size: 16px !important;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Centered Auth Layout (Microsoft / Google Style) */
+.auth-bg-light {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  background-color: var(--bg-main);
+}
+
+.auth-card-light {
+  width: 100%;
+  max-width: 440px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 2.5rem 2.25rem;
+  box-shadow: var(--shadow-lg);
+}
+
+/* Light SaaS Sidebar Layout */
+#wrapper {
+  display: flex;
+  width: 100%;
+  align-items: stretch;
+  min-height: 100vh;
+}
+
+#sidebar-wrapper {
+  min-width: 260px;
+  max-width: 260px;
+  background-color: var(--bg-sidebar);
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: margin-left 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1000;
+}
+
+.sidebar-brand-box {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.sidebar-logo-icon {
+  width: 34px;
+  height: 34px;
+  background-color: var(--primary-blue);
+  color: #FFFFFF;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+}
+
+.sidebar-menu-list {
+  padding: 1.25rem 0.75rem;
+  flex-grow: 1;
+}
+
+.sidebar-section-header {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  padding: 0 0.75rem 0.5rem 0.75rem;
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.65rem 0.85rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: 14px;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  margin-bottom: 0.25rem;
+  position: relative;
+  transition: all 0.15s ease;
+}
+
+.sidebar-link:hover {
+  color: var(--text-primary);
+  background-color: #F1F5F9;
+}
+
+.sidebar-link.active {
+  color: var(--primary-blue);
+  background-color: var(--primary-subtle);
+  font-weight: 600;
+}
+
+.sidebar-link.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 6px;
+  bottom: 6px;
+  width: 3.5px;
+  background-color: var(--primary-blue);
+  border-radius: 0 4px 4px 0;
+}
+
+.sidebar-footer-box {
+  padding: 1rem 1.25rem;
+  border-top: 1px solid var(--border-color);
+  background-color: #FAFAFA;
+}
+
+/* Page Layout & Top Navigation Bar */
+#page-content-wrapper {
+  width: 100%;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.top-navbar-light {
+  background-color: var(--bg-topbar);
+  border-bottom: 1px solid var(--border-color);
+  padding: 0.85rem 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 999;
+}
+
+/* Cards & Surfaces */
+.card-saas-light {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.card-saas-interactive:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover);
+  border-color: #CBD5E1;
+}
+
+.card-header-light {
+  background-color: transparent;
+  border-bottom: 1px solid var(--border-color);
+  padding: 1rem 1.5rem;
+}
+
+/* Metric Cards */
+.metric-icon-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+}
+
+.metric-blue {
+  background-color: var(--primary-subtle);
+  color: var(--primary-blue);
+  border: 1px solid #DBEAFE;
+}
+
+.metric-emerald {
+  background-color: var(--success-subtle);
+  color: var(--success);
+  border: 1px solid #DCFCE7;
+}
+
+.metric-amber {
+  background-color: var(--warning-subtle);
+  color: var(--warning);
+  border: 1px solid #FEF3C7;
+}
+
+.metric-purple {
+  background-color: #F3E8FF;
+  color: #9333EA;
+  border: 1px solid #E9D5FF;
+}
+
+/* Modern Form Controls */
+label.form-label-saas {
+  color: var(--text-primary) !important;
+  font-weight: 500;
+  font-size: 14px;
+  margin-bottom: 0.4rem;
+}
+
+.form-control-saas {
+  background-color: var(--bg-input) !important;
+  border: 1px solid #D1D5DB !important;
+  color: var(--text-primary) !important;
+  border-radius: var(--radius-sm) !important;
+  padding: 0.65rem 0.9rem !important;
+  font-size: 14px !important;
+  transition: all 0.15s ease !important;
+}
+
+.form-select-saas {
+  background-color: var(--bg-input) !important;
+  border: 1px solid #D1D5DB !important;
+  color: var(--text-primary) !important;
+  border-radius: var(--radius-sm) !important;
+  padding: 0.65rem 2.25rem 0.65rem 0.9rem !important;
+  font-size: 14px !important;
+  transition: all 0.15s ease !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+}
+
+.form-control-saas::placeholder {
+  color: var(--text-muted) !important;
+}
+
+.form-control-saas:focus,
+.form-select-saas:focus {
+  border-color: var(--primary-blue) !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15) !important;
+  outline: none !important;
+}
+
+/* Buttons */
+.btn-saas-primary {
+  background-color: var(--primary-blue);
+  color: #FFFFFF;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 0.65rem 1.25rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.15s ease-in-out;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.btn-saas-primary:hover,
+.btn-saas-primary:focus {
+  background-color: var(--primary-hover);
+  color: #FFFFFF;
+  box-shadow: var(--shadow-md);
+}
+
+.btn-saas-secondary {
+  background-color: #FFFFFF;
+  color: var(--text-primary);
+  font-weight: 500;
+  font-size: 14px;
+  padding: 0.65rem 1.25rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid #D1D5DB;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.btn-saas-secondary:hover {
+  background-color: #F8FAFC;
+  color: var(--text-primary);
+  border-color: #9CA3AF;
+}
+
+/* Links */
+a.saas-link {
+  color: var(--primary-blue);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.15s ease;
+}
+
+a.saas-link:hover {
+  color: var(--primary-hover);
+  text-decoration: underline;
+}
+
+/* Clean SaaS Table Styling */
+.table-saas {
+  --bs-table-bg: transparent;
+  color: var(--text-primary);
+}
+
+.table-saas thead th {
+  background-color: #F8FAFC;
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--border-color);
+  padding: 0.85rem 1.25rem;
+}
+
+.table-saas tbody td {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 14px;
+  vertical-align: middle;
+}
+
+.table-saas tbody tr:hover {
+  background-color: #F8FAFC;
+}
+
+/* ChatGPT Style Light Chat Interface */
+.chat-box-saas {
+  height: 640px;
+  display: flex;
+  flex-direction: column;
+  background-color: #FFFFFF;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+}
+
+.chat-user-bubble {
+  background-color: var(--primary-blue);
+  color: #FFFFFF;
+  font-weight: 400;
+  border-radius: 16px 16px 2px 16px;
+  padding: 0.85rem 1.15rem;
+  max-width: 80%;
+  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.15);
+}
+
+.chat-ai-bubble {
+  background-color: #F1F5F9;
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 16px 16px 16px 2px;
+  padding: 0.85rem 1.15rem;
+  max-width: 85%;
+  line-height: 1.6;
+}
+
+/* Typing Indicator Animation */
+.typing-dots {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+}
+
+.typing-dot {
+  width: 7px;
+  height: 7px;
+  background-color: var(--text-muted);
+  border-radius: 50%;
+  animation: typingBounce 1.4s infinite ease-in-out both;
+}
+
+.typing-dot:nth-child(1) { animation-delay: -0.32s; }
+.typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes typingBounce {
+  0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+  40% { transform: scale(1); opacity: 1; }
+}
+
+/* PDF Drag & Drop Zone */
+.dropzone-light {
+  border: 2px dashed #CBD5E1;
+  border-radius: var(--radius-md);
+  background-color: #F8FAFC;
+  padding: 2.25rem 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dropzone-light:hover,
+.dropzone-light.dragover {
+  border-color: var(--primary-blue);
+  background-color: var(--primary-subtle);
+}
+
+/* Empty State Container */
+.empty-state-box {
+  padding: 3.5rem 2rem;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.empty-state-icon {
+  width: 64px;
+  height: 64px;
+  background-color: var(--primary-subtle);
+  color: var(--primary-blue);
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+}
+
+/* Footer Styling */
+.saas-footer {
+  padding: 1.25rem 2rem;
+  border-top: 1px solid var(--border-color);
+  background-color: #FFFFFF;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+/* Responsive sidebar */
+@media (max-width: 991.98px) {
+  #sidebar-wrapper {
+    margin-left: -260px;
+    position: fixed;
+    height: 100vh;
+  }
+  #sidebar-wrapper.toggled {
+    margin-left: 0;
+  }
+}

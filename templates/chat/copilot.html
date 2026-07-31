@@ -1,0 +1,199 @@
+{% extends 'base.html' %}
+
+{% block title %}AI Chat - AI SDR Copilot{% endblock %}
+{% block page_heading %}AI Sales Copilot{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+  <div>
+    <h1 class="page-title mb-1">AI Sales Copilot Console</h1>
+    <p class="text-muted small mb-0">Ask questions about target companies or your indexed PDF sales collateral using LangGraph RAG.</p>
+  </div>
+</div>
+
+<div class="row g-4">
+  
+  <!-- Left Side: Context & Suggested Prompts -->
+  <div class="col-lg-4">
+    <div class="card-saas-light p-4 mb-4">
+      <div class="d-flex align-items-center gap-2 mb-3">
+        <i class="bi bi-sliders text-primary fs-5"></i>
+        <h5 class="fw-bold text-dark mb-0">Active Context</h5>
+      </div>
+
+      <div class="mb-3">
+        <label for="company_select" class="form-label-saas">Target Account Context</label>
+        <select id="company_select" class="form-select form-select-saas">
+          <option value="">-- Global / All Companies --</option>
+          {% for company in companies %}
+            <option value="{{ company.id }}">{{ company.name }} ({{ company.industry|default:"General" }})</option>
+          {% endfor %}
+        </select>
+        <div class="form-text text-muted extra-small mt-1">Inject account insights into LangGraph prompt.</div>
+      </div>
+
+      <div class="p-3 rounded-3 border bg-light">
+        <div class="d-flex align-items-center gap-2 mb-2 text-primary small fw-semibold">
+          <i class="bi bi-diagram-3-fill"></i> LangGraph RAG Workflow
+        </div>
+        <ul class="list-unstyled extra-small text-secondary mb-0">
+          <li class="mb-1"><i class="bi bi-check-circle-fill text-success me-1"></i> Account Research Context Injection</li>
+          <li class="mb-1"><i class="bi bi-check-circle-fill text-success me-1"></i> Vector Store Similarity Search</li>
+          <li><i class="bi bi-check-circle-fill text-success me-1"></i> Google Gemini API Synthesis</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Suggested Sample Prompts -->
+    <div class="card-saas-light p-4">
+      <h6 class="fw-bold text-dark mb-3"><i class="bi bi-lightbulb text-warning me-2"></i>Suggested Questions</h6>
+      <div class="d-flex flex-column gap-2">
+        <button class="btn btn-saas-secondary btn-sm text-start text-dark p-2.5" onclick="useSamplePrompt('How should I approach this company for our first sales call?')">
+          "How should I approach this company?"
+        </button>
+        <button class="btn btn-saas-secondary btn-sm text-start text-dark p-2.5" onclick="useSamplePrompt('What products or pricing information do we offer in our uploaded documents?')">
+          "What products does our company offer?"
+        </button>
+        <button class="btn btn-saas-secondary btn-sm text-start text-dark p-2.5" onclick="useSamplePrompt('What pain points should I target in my sales pitch?')">
+          "What pain points should I target in my pitch?"
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Side: ChatGPT Light Console -->
+  <div class="col-lg-8">
+    <div class="chat-box-saas">
+      
+      <!-- Console Header -->
+      <div class="card-header-light p-3 d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center gap-3">
+          <div class="sidebar-logo-icon" style="width: 36px; height: 36px;">
+            <i class="bi bi-robot"></i>
+          </div>
+          <div>
+            <h6 class="fw-bold text-dark mb-0">AI Sales Copilot</h6>
+            <span class="text-success extra-small"><i class="bi bi-circle-fill me-1" style="font-size: 8px;"></i>Online & Ready</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Messages Scroll Area -->
+      <div class="card-body p-4 overflow-auto flex-grow-1" id="chat-messages-container">
+        
+        <!-- Welcome AI Message -->
+        <div class="d-flex gap-3 mb-4">
+          <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; min-width: 36px;">
+            <i class="bi bi-robot fs-5"></i>
+          </div>
+          <div class="chat-ai-bubble">
+            Hello! I am your AI Sales Copilot. Ask any question about your target companies or indexed PDF sales documents. How can I assist your outreach today?
+          </div>
+        </div>
+
+        <!-- Conversation History -->
+        {% for chat in history %}
+          <!-- User Query -->
+          <div class="d-flex justify-content-end gap-3 mb-4">
+            <div class="chat-user-bubble">
+              {{ chat.question }}
+            </div>
+            <div class="rounded-circle bg-light border text-dark d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; min-width: 36px;">
+              <i class="bi bi-person-fill fs-5"></i>
+            </div>
+          </div>
+
+          <!-- AI Answer -->
+          <div class="d-flex gap-3 mb-4">
+            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; min-width: 36px;">
+              <i class="bi bi-robot fs-5"></i>
+            </div>
+            <div class="chat-ai-bubble position-relative">
+              <div id="ai-response-{{ forloop.counter }}">
+                {{ chat.answer|linebreaks }}
+              </div>
+              <div class="d-flex align-items-center justify-content-between mt-2 pt-2 border-top text-muted extra-small">
+                <span><i class="bi bi-clock me-1"></i>{{ chat.timestamp|date:"H:i" }}</span>
+                <button class="btn btn-sm btn-link text-muted p-0 text-decoration-none" onclick="copyToClipboard('ai-response-{{ forloop.counter }}', this)">
+                  <i class="bi bi-clipboard me-1"></i> Copy
+                </button>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+
+        <!-- Typing Animation Skeleton (Hidden by Default) -->
+        <div class="d-flex gap-3 mb-4 d-none" id="typing-indicator">
+          <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; min-width: 36px;">
+            <i class="bi bi-robot fs-5"></i>
+          </div>
+          <div class="chat-ai-bubble">
+            <div class="typing-dots">
+              <div class="typing-dot"></div>
+              <div class="typing-dot"></div>
+              <div class="typing-dot"></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Chat Input Form Footer -->
+      <div class="p-3 border-top bg-white">
+        <form id="chat-form" method="POST" action="{% url 'chat:index' %}">
+          {% csrf_token %}
+          <input type="hidden" name="company_id" id="hidden_company_id" value="">
+          <div class="input-group">
+            <input type="text" name="question" id="user-question-input" class="form-control form-control-saas py-2.5" placeholder="Ask a question (e.g. How should I approach this company?)" required>
+            <button type="submit" class="btn btn-saas-primary px-4" id="send-chat-btn">
+              <i class="bi bi-send-fill me-1"></i> Send
+            </button>
+          </div>
+        </form>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function useSamplePrompt(text) {
+  const input = document.getElementById('user-question-input');
+  if (input) {
+    input.value = text;
+    input.focus();
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  scrollChatToBottom();
+
+  const selectElem = document.getElementById('company_select');
+  const hiddenInput = document.getElementById('hidden_company_id');
+  if (selectElem && hiddenInput) {
+    hiddenInput.value = selectElem.value;
+    selectElem.addEventListener('change', () => {
+      hiddenInput.value = selectElem.value;
+    });
+  }
+});
+
+const chatForm = document.getElementById('chat-form');
+const typingIndicator = document.getElementById('typing-indicator');
+
+if (chatForm && typingIndicator) {
+  chatForm.addEventListener('submit', () => {
+    const selectElem = document.getElementById('company_select');
+    const hiddenInput = document.getElementById('hidden_company_id');
+    if (selectElem && hiddenInput) {
+      hiddenInput.value = selectElem.value;
+    }
+    typingIndicator.classList.remove('d-none');
+    setTimeout(scrollChatToBottom, 50);
+  });
+}
+</script>
+{% endblock %}

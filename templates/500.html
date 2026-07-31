@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}500 - Internal Server Error | AI SDR Copilot{% endblock %}
+
+{% block content %}
+<div class="container py-5 text-center" style="max-width: 600px;">
+    <div class="card card-saas p-5">
+        <div class="display-1 text-danger fw-bold mb-3">500</div>
+        <h3 class="fw-semibold mb-3 text-dark">Server Error</h3>
+        <p class="text-secondary mb-4">
+            An unexpected internal error occurred. Our logging system has captured this event.
+        </p>
+        <div>
+            <a href="{% url 'dashboard:index' %}" class="btn btn-saas-primary px-4 py-2">
+                <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

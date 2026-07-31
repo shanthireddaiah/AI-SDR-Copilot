@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ company.name }} - Account Record{% endblock %}
+{% block page_heading %}{{ company.name }} Intelligence Record{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+  <a href="{% url 'research:index' %}" class="btn btn-sm btn-saas-secondary">
+    <i class="bi bi-arrow-left me-1"></i> Back to Accounts List
+  </a>
+</div>
+
+<!-- Prospect Account Header Banner -->
+<div class="card-saas-light p-4 p-md-5 mb-4">
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+    <div>
+      <div class="d-flex align-items-center gap-3 mb-2">
+        <h2 class="fw-bold text-dark mb-0">{{ company.name }}</h2>
+        <span class="badge bg-primary px-3 py-1.5 rounded-pill small">{{ company.industry|default:"General Industry" }}</span>
+      </div>
+      <div class="d-flex align-items-center gap-4 text-muted small">
+        {% if company.website %}
+          <span><i class="bi bi-globe text-primary me-1"></i><a href="{{ company.website }}" target="_blank" class="saas-link">{{ company.website }}</a></span>
+        {% endif %}
+        <span><i class="bi bi-calendar3 me-1"></i>Researched: {{ company.created_at|date:"M d, Y" }}</span>
+      </div>
+    </div>
+    <div>
+      <a href="{% url 'chat:index' %}?company_id={{ company.id }}" class="btn btn-saas-primary">
+        <i class="bi bi-robot me-1"></i> Launch AI Copilot Session
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- Tabs for Summary & Outreach -->
+<ul class="nav nav-tabs border-bottom mb-4" id="companyTabs" role="tablist">
+  <li class="nav-item" role="presentation">
+    <button class="nav-link active text-dark fw-semibold px-4 py-2.5" id="summary-tab" data-bs-toggle="tab" data-bs-target="#summary-pane" type="button" role="tab">
+      <i class="bi bi-file-text me-2 text-primary"></i> Business Overview & Insights
+    </button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link text-dark fw-semibold px-4 py-2.5" id="outreach-tab" data-bs-toggle="tab" data-bs-target="#outreach-pane" type="button" role="tab">
+      <i class="bi bi-send me-2 text-success"></i> Personalized Outreach Copy
+    </button>
+  </li>
+</ul>
+
+<div class="tab-content" id="companyTabsContent">
+  
+  <!-- Tab 1: Overview & Insights -->
+  <div class="tab-pane fade show active" id="summary-pane" role="tabpanel">
+    <div class="row g-4">
+      
+      <!-- Overview & Products -->
+      <div class="col-lg-6">
+        <div class="card-saas-light p-4 mb-4">
+          <h5 class="fw-bold text-dark mb-3"><i class="bi bi-building text-primary me-2"></i>Business Overview</h5>
+          <p class="text-secondary leading-relaxed">{{ company.overview|default:"Overview information pending."|linebreaks }}</p>
+        </div>
+
+        <div class="card-saas-light p-4">
+          <h5 class="fw-bold text-dark mb-3"><i class="bi bi-box-seam text-info me-2"></i>Products & Offerings</h5>
+          <p class="text-secondary leading-relaxed">{{ company.products|default:"Products information pending."|linebreaks }}</p>
+        </div>
+      </div>
+
+      <!-- Pain Points & Recommendations -->
+      <div class="col-lg-6">
+        <div class="card-saas-light p-4 mb-4 border-start border-4 border-warning">
+          <h5 class="fw-bold text-warning mb-3"><i class="bi bi-exclamation-triangle me-2"></i>Customer Pain Points</h5>
+          <p class="text-secondary leading-relaxed">{{ company.pain_points|default:"Pain points pending analysis."|linebreaks }}</p>
+        </div>
+
+        <div class="card-saas-light p-4 border-start border-4 border-success">
+          <h5 class="fw-bold text-success mb-3"><i class="bi bi-lightbulb me-2"></i>AI Sales Recommendations</h5>
+          <p class="text-secondary leading-relaxed">{{ company.sales_insights|default:"Sales insights pending analysis."|linebreaks }}</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Tab 2: Outreach Copy Templates -->
+  <div class="tab-pane fade" id="outreach-pane" role="tabpanel">
+    <div class="row g-4">
+      
+      <!-- Cold Email -->
+      <div class="col-lg-4">
+        <div class="card-saas-light p-4 h-100 d-flex flex-column">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="fw-bold text-dark mb-0"><i class="bi bi-envelope-paper text-primary me-2"></i>Personalized Cold Email</h6>
+            <button class="btn btn-sm btn-saas-secondary" onclick="copyToClipboard('email-text', this)">
+              <i class="bi bi-clipboard"></i> Copy
+            </button>
+          </div>
+          <textarea id="email-text" class="form-control form-control-saas font-monospace text-secondary flex-grow-1" rows="13" readonly>{{ company.email_outreach|default:"Outreach email pending generation." }}</textarea>
+        </div>
+      </div>
+
+      <!-- LinkedIn DM -->
+      <div class="col-lg-4">
+        <div class="card-saas-light p-4 h-100 d-flex flex-column">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="fw-bold text-dark mb-0"><i class="bi bi-linkedin text-info me-2"></i>LinkedIn Direct Msg</h6>
+            <button class="btn btn-sm btn-saas-secondary" onclick="copyToClipboard('linkedin-text', this)">
+              <i class="bi bi-clipboard"></i> Copy
+            </button>
+          </div>
+          <textarea id="linkedin-text" class="form-control form-control-saas font-monospace text-secondary flex-grow-1" rows="13" readonly>{{ company.linkedin_outreach|default:"LinkedIn message pending generation." }}</textarea>
+        </div>
+      </div>
+
+      <!-- Cold Call Script -->
+      <div class="col-lg-4">
+        <div class="card-saas-light p-4 h-100 d-flex flex-column">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="fw-bold text-dark mb-0"><i class="bi bi-telephone-outbound text-warning me-2"></i>Cold Call Script</h6>
+            <button class="btn btn-sm btn-saas-secondary" onclick="copyToClipboard('phone-text', this)">
+              <i class="bi bi-clipboard"></i> Copy
+            </button>
+          </div>
+          <textarea id="phone-text" class="form-control form-control-saas font-monospace text-secondary flex-grow-1" rows="13" readonly>{{ company.cold_call_script|default:"Cold call pitch pending generation." }}</textarea>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+{% endblock %}

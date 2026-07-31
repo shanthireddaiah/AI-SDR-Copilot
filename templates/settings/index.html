@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}Account & Profile Settings | AI SDR Copilot{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h1 class="page-title mb-1">Settings & User Profile</h1>
+    <p class="text-secondary small mb-0">Manage your profile, target industry preferences, OpenAI API keys, and security credentials.</p>
+</div>
+
+<div class="row g-4">
+    <!-- User Profile & API Settings Card -->
+    <div class="col-lg-7">
+        <div class="card card-saas-light p-4 mb-4">
+            <h5 class="fw-bold text-dark mb-3"><i class="bi bi-person-gear text-primary me-2"></i>Profile & API Configuration</h5>
+            
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="form_type" value="profile">
+
+                <div class="row mb-3">
+                    <div class="col-md-6 mb-3 mb-md-0">
+                        <label class="form-label form-label-saas">First Name</label>
+                        {{ profile_form.first_name }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label form-label-saas">Last Name</label>
+                        {{ profile_form.last_name }}
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label form-label-saas">Email Address</label>
+                    {{ profile_form.email }}
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6 mb-3 mb-md-0">
+                        <label class="form-label form-label-saas">Job Title</label>
+                        {{ profile_form.job_title }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label form-label-saas">Target Industry Focus</label>
+                        {{ profile_form.target_industry }}
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label form-label-saas">Preferred Sales Tone</label>
+                    {{ profile_form.preferred_tone }}
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label form-label-saas">Custom OpenAI API Key (Optional)</label>
+                    {{ profile_form.custom_openai_key }}
+                    <div class="form-text small text-muted">Leave blank or set to 'demo' to run in zero-config Demo Mode with built-in mock AI intelligence.</div>
+                </div>
+
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-saas-primary"><i class="bi bi-check2-circle me-1"></i> Save Profile Settings</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Password & Security Card -->
+    <div class="col-lg-5">
+        <div class="card card-saas-light p-4 mb-4">
+            <h5 class="fw-bold text-dark mb-3"><i class="bi bi-shield-lock text-warning me-2"></i>Change Password</h5>
+            
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="form_type" value="password">
+
+                {% for field in password_form %}
+                <div class="mb-3">
+                    <label class="form-label form-label-saas">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <div class="text-danger extra-small mt-1">{{ field.errors.0 }}</div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+
+                <div class="d-flex justify-content-end mt-3">
+                    <button type="submit" class="btn btn-saas-secondary"><i class="bi bi-key me-1"></i> Update Password</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="card card-saas-light p-4 bg-light">
+            <h6 class="fw-bold text-dark mb-2"><i class="bi bi-shield-check text-success me-2"></i>Role & Privileges</h6>
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <span class="text-muted small">System Role:</span>
+                <span class="badge {% if profile.is_admin_user %}bg-danger{% else %}bg-primary{% endif %} px-2 py-1">
+                    {{ profile.get_role_display }}
+                </span>
+            </div>
+            <div class="d-flex align-items-center justify-content-between">
+                <span class="text-muted small">Account Created:</span>
+                <span class="fw-semibold text-dark small">{{ user.date_joined|date:"M d, Y" }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

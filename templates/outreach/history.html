@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}Outreach Campaign History | AI SDR Copilot{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="page-title mb-1">Outreach Campaign History</h1>
+        <p class="text-secondary small mb-0">Browse and search all generated cold emails, call scripts, and LinkedIn messages.</p>
+    </div>
+    <div>
+        <a href="{% url 'outreach:generate' %}" class="btn btn-saas-primary">
+            <i class="bi bi-plus-lg me-1"></i> New Outreach Campaign
+        </a>
+    </div>
+</div>
+
+<!-- Search & Filter Bar -->
+<div class="card card-saas-light p-3 mb-4">
+    <form method="GET" class="row g-2">
+        <div class="col-md-6">
+            <input type="text" name="q" value="{{ query }}" class="form-control form-control-saas" placeholder="Search by company, subject, or keyword...">
+        </div>
+        <div class="col-md-4">
+            <select name="type" class="form-select form-select-saas">
+                <option value="">All Message Formats</option>
+                {% for code, label in type_choices %}
+                    <option value="{{ code }}" {% if selected_type == code %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2 d-grid">
+            <button type="submit" class="btn btn-saas-secondary"><i class="bi bi-funnel me-1"></i> Filter</button>
+        </div>
+    </form>
+</div>
+
+{% if page_obj %}
+<div class="card card-saas-light overflow-hidden mb-4">
+    <div class="table-responsive">
+        <table class="table table-saas mb-0">
+            <thead>
+                <tr>
+                    <th>Format</th>
+                    <th>Target Company</th>
+                    <th>Subject / Pitch Title</th>
+                    <th>Created Date</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in page_obj %}
+                <tr>
+                    <td>
+                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1">
+                            {{ item.get_message_type_display }}
+                        </span>
+                    </td>
+                    <td><strong>{% if item.company %}{{ item.company.name }}{% else %}General Prospect{% endif %}</strong></td>
+                    <td>{{ item.subject|truncatechars:45|default:"Outreach Pitch" }}</td>
+                    <td class="text-muted small">{{ item.created_at|date:"M d, Y H:i" }}</td>
+                    <td class="text-end">
+                        <a href="{% url 'outreach:detail' item.pk %}" class="btn btn-sm btn-saas-secondary me-1"><i class="bi bi-eye"></i> View</a>
+                        <a href="{% url 'outreach:export_pdf' item.pk %}" class="btn btn-sm btn-saas-secondary me-1"><i class="bi bi-file-pdf text-danger"></i> PDF</a>
+                        <a href="{% url 'outreach:export_txt' item.pk %}" class="btn btn-sm btn-saas-secondary"><i class="bi bi-file-text text-secondary"></i> TXT</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Pagination Controls -->
+{% if page_obj.has_other_pages %}
+<nav aria-label="Outreach history pagination">
+    <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}&q={{ query }}&type={{ selected_type }}">Previous</a></li>
+        {% endif %}
+        
+        {% for num in page_obj.paginator.page_range %}
+            <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                <a class="page-link" href="?page={{ num }}&q={{ query }}&type={{ selected_type }}">{{ num }}</a>
+            </li>
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}&q={{ query }}&type={{ selected_type }}">Next</a></li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+
+{% else %}
+<div class="card card-saas-light p-5 text-center">
+    <div class="empty-state-icon"><i class="bi bi-send-x"></i></div>
+    <h5 class="fw-bold text-dark mb-2">No Outreach Campaigns Found</h5>
+    <p class="text-secondary small mb-3">You haven't generated any outreach campaigns matching your criteria.</p>
+    <div>
+        <a href="{% url 'outreach:generate' %}" class="btn btn-saas-primary"><i class="bi bi-sparkles me-1"></i> Generate Outreach Now</a>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
