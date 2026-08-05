@@ -267,7 +267,20 @@ def process_and_embed_pdf(doc_instance):
     ef = SafeDemoEmbeddingFunction()
     embeddings = None
 
-    if not is_demo_mode():
+    gemini_key = getattr(settings, 'GEMINI_API_KEY', None) or os.getenv('GEMINI_API_KEY')
+    if gemini_key and gemini_key.strip():
+        try:
+            from google import genai
+            g_client = genai.Client(api_key=gemini_key)
+            g_res = g_client.models.embed_content(
+                model="gemini-embedding-001",
+                contents=documents
+            )
+            embeddings = [e.values for e in g_res.embeddings]
+        except Exception as ge:
+            logger.warning(f"Gemini Embeddings API failed: {ge}. Falling back.")
+
+    if not embeddings and not is_demo_mode():
         try:
             from openai import OpenAI
             api_key = getattr(settings, 'OPENAI_API_KEY', None) or os.getenv('OPENAI_API_KEY')
@@ -328,7 +341,20 @@ def query_knowledge_base(query_text, user_id, top_k=3):
             return []
 
         query_embedding = None
-        if not is_demo_mode():
+        gemini_key = getattr(settings, 'GEMINI_API_KEY', None) or os.getenv('GEMINI_API_KEY')
+        if gemini_key and gemini_key.strip():
+            try:
+                from google import genai
+                g_client = genai.Client(api_key=gemini_key)
+                g_res = g_client.models.embed_content(
+                    model="gemini-embedding-001",
+                    contents=[query_text]
+                )
+                query_embedding = g_res.embeddings[0].values
+            except Exception as ge:
+                logger.warning(f"Gemini embedding query failed: {ge}.")
+
+        if not query_embedding and not is_demo_mode():
             try:
                 from openai import OpenAI
                 api_key = getattr(settings, 'OPENAI_API_KEY', None) or os.getenv('OPENAI_API_KEY')

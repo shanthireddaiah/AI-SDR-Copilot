@@ -114,7 +114,7 @@ def generate_company_research(name, website="", industry="", description=""):
             - "pain_points": 3-4 likely customer or operational pain points.
             - "sales_insights": 3-4 actionable AI-generated sales outreach recommendations.
             """
-            for m in ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash", "gemini-2.0-flash-lite"]:
+            for m in ["gemini-3.6-flash", "gemini-3.5-flash", "gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash", "gemini-2.0-flash-lite"]:
                 try:
                     res = client.models.generate_content(
                         model=m,

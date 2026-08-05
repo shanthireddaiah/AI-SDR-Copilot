@@ -42,7 +42,7 @@ Instructions:
 2. Provide a compelling subject line (if applicable).
 3. Focus on driving a 15-minute discovery call.
 """
-            for m in ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash", "gemini-2.0-flash-lite"]:
+            for m in ["gemini-3.6-flash", "gemini-3.5-flash", "gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash", "gemini-2.0-flash-lite"]:
                 try:
                     res = client.models.generate_content(
                         model=m,
